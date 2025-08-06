@@ -1,44 +1,40 @@
 import React from 'react';
-import { Column, Item } from './types';
+import { Column } from './types';
 import { ListColumn } from './ListColumn';
 import { AddItemForm } from './AddItemForm';
-
-const dummyTodos: Item[] = [
-  { id: '1', text: 'Learn React', status: 'todo' },
-  { id: '2', text: 'Build todo app', status: 'todo' },
-  { id: '3', text: 'Write tests', status: 'in-progress' },
-  { id: '4', text: 'Deploy application', status: 'done' },
-];
+import { useToDoList } from './useToDoList';
 
 export function ToDoList() {
+  const { getItemsByStatus, addTodo, moveItem } = useToDoList();
+
   const toDoColumn: Column = {
     status: 'todo',
     title: 'Todo',
-    items: dummyTodos.filter(item => item.status === 'todo')
+    items: getItemsByStatus('todo')
   };
 
   const inProgressColumn: Column = {
     status: 'in-progress',
     title: 'In Progress',
-    items: dummyTodos.filter(item => item.status === 'in-progress')
+    items: getItemsByStatus('in-progress')
   };
 
   const doneColumn: Column = {
     status: 'done',
     title: 'Done',
-    items: dummyTodos.filter(item => item.status === 'done')
+    items: getItemsByStatus('done')
   };
 
   const handleMoveLeft = (itemId: string) => {
-    console.log('Move left:', itemId);
+    moveItem(itemId, 'left');
   };
 
   const handleMoveRight = (itemId: string) => {
-    console.log('Move right:', itemId);
+    moveItem(itemId, 'right');
   };
 
   const handleAddTodo = (text: string) => {
-    console.log('Add todo:', text);
+    addTodo(text);
   };
 
   return (
