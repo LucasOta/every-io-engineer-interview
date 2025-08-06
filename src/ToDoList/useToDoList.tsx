@@ -16,7 +16,14 @@ export function useToDoList() {
   };
 
   const addTodo = (text: string) => {
-    console.log('Add todo:', text);
+    if (text.trim()) {
+      const newItem: Item = {
+        id: Date.now().toString(),
+        text: text.trim(),
+        status: 'todo'
+      };
+      setItems(prevItems => [...prevItems, newItem]);
+    }
   };
 
   const moveItem = (itemId: string, direction: 'left' | 'right') => {
