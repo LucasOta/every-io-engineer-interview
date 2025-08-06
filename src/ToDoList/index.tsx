@@ -1,18 +1,20 @@
 import React from 'react';
-import { TodoStatus, Direction } from './types';
+import { Direction } from './types';
 import { ListColumn } from './ListColumn';
 import { AddItemForm } from './AddItemForm';
 import { useToDoList } from './useToDoList';
+import { defaultWorkflowConfig, getOrderedStatuses } from './workflowConfig';
 
 export function ToDoList() {
-  const { todoItems, inProgressItems, doneItems, addTodo, moveItem } = useToDoList();
+  const { itemsByStatus, addItem, moveItem, canMove, config } = useToDoList(defaultWorkflowConfig);
+  const orderedStatuses = getOrderedStatuses(config);
 
   const handleMove = (itemId: string, direction: Direction) => {
     moveItem(itemId, direction);
   };
 
-  const handleAddTodo = (text: string) => {
-    addTodo(text);
+  const handleAddItem = (text: string) => {
+    addItem(text);
   };
 
   return (
@@ -33,24 +35,18 @@ export function ToDoList() {
         gap: '16px',
         marginBottom: '20px'
       }}>
-        <ListColumn
-          title="To Do"
-          items={todoItems}
-          onMove={handleMove}
-        />
-        <ListColumn
-          title="In Progress"
-          items={inProgressItems}
-          onMove={handleMove}
-        />
-        <ListColumn
-          title="Done"
-          items={doneItems}
-          onMove={handleMove}
-        />
+        {orderedStatuses.map(status => (
+          <ListColumn
+            key={status.id}
+            title={status.title}
+            items={itemsByStatus[status.id] || []}
+            onMove={handleMove}
+            canMove={canMove}
+          />
+        ))}
       </div>
 
-      <AddItemForm onSubmit={handleAddTodo} />
+      <AddItemForm onSubmit={handleAddItem} />
     </div>
   );
 }

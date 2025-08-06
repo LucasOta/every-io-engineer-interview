@@ -1,49 +1,47 @@
 import { useState } from 'react';
-import { Item, TodoStatus, Direction } from './types';
+import { Item, TodoStatus, Direction, ItemsByStatus } from './types';
+import { WorkflowConfig, buildTransitionMap, getInitialStatus } from './workflowConfig';
 
-type ItemsByStatus = Record<TodoStatus, Item[]>;
-
-const initialItemsByStatus: ItemsByStatus = {
-  [TodoStatus.TODO]: [
+function createInitialItemsByStatus(config: WorkflowConfig): ItemsByStatus {
+  const itemsByStatus = {} as ItemsByStatus;
+  
+  config.statuses.forEach(status => {
+    itemsByStatus[status.id] = [];
+  });
+  
+  // Add some sample data
+  itemsByStatus[TodoStatus.TODO] = [
     { id: '1', text: 'Learn React', status: TodoStatus.TODO },
     { id: '2', text: 'Build todo app', status: TodoStatus.TODO },
-  ],
-  [TodoStatus.IN_PROGRESS]: [
+  ];
+  itemsByStatus[TodoStatus.IN_PROGRESS] = [
     { id: '3', text: 'Write tests', status: TodoStatus.IN_PROGRESS },
-  ],
-  [TodoStatus.DONE]: [
+  ];
+  itemsByStatus[TodoStatus.DONE] = [
     { id: '4', text: 'Deploy application', status: TodoStatus.DONE },
-  ],
-};
+  ];
+  
+  return itemsByStatus;
+}
 
-const statusTransitions = {
-  [TodoStatus.TODO]: {
-    [Direction.NEXT]: TodoStatus.IN_PROGRESS,
-    [Direction.PREV]: TodoStatus.TODO, // No change
-  },
-  [TodoStatus.IN_PROGRESS]: {
-    [Direction.NEXT]: TodoStatus.DONE,
-    [Direction.PREV]: TodoStatus.TODO,
-  },
-  [TodoStatus.DONE]: {
-    [Direction.NEXT]: TodoStatus.DONE, // No change
-    [Direction.PREV]: TodoStatus.IN_PROGRESS,
-  },
-};
+export function useToDoList(config: WorkflowConfig) {
+  const [itemsByStatus, setItemsByStatus] = useState<ItemsByStatus>(() => 
+    createInitialItemsByStatus(config)
+  );
+  
+  const transitionMap = buildTransitionMap(config.transitions);
+  const initialStatus = getInitialStatus(config);
 
-export function useToDoList() {
-  const [itemsByStatus, setItemsByStatus] = useState<ItemsByStatus>(initialItemsByStatus);
-
-  const addTodo = (text: string) => {
+  const addItem = (text: string) => {
     if (text.trim()) {
       const newItem: Item = {
         id: Date.now().toString(),
         text: text.trim(),
-        status: TodoStatus.TODO
+        status: initialStatus
       };
       setItemsByStatus(prev => ({
         ...prev,
-        [TodoStatus.TODO]: [...prev[TodoStatus.TODO], newItem]
+        [initialStatus]: [...prev[initialStatus], newItem]
       }));
     }
   };
@@ -57,9 +55,9 @@ export function useToDoList() {
       if (!currentItem) return prev;
       
       const currentStatus = currentItem.status;
-      const newStatus = statusTransitions[currentStatus][direction];
+      const newStatus = transitionMap[currentStatus]?.[direction];
       
-      if (currentStatus === newStatus) return prev;
+      if (!newStatus || currentStatus === newStatus) return prev;
       
       const updatedItem = { ...currentItem, status: newStatus };
       
@@ -71,11 +69,16 @@ export function useToDoList() {
     });
   };
 
+  const canMove = (itemStatus: TodoStatus, direction: Direction): boolean => {
+    const targetStatus = transitionMap[itemStatus]?.[direction];
+    return targetStatus !== undefined && targetStatus !== itemStatus;
+  };
+
   return {
-    todoItems: itemsByStatus[TodoStatus.TODO],
-    inProgressItems: itemsByStatus[TodoStatus.IN_PROGRESS],
-    doneItems: itemsByStatus[TodoStatus.DONE],
-    addTodo,
+    itemsByStatus,
+    addItem,
     moveItem,
+    canMove,
+    config,
   };
 }

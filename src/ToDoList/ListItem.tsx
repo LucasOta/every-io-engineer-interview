@@ -6,9 +6,13 @@ interface ListItemProps {
   onMove: (itemId: string, direction: Direction) => void;
 }
 
-export function ListItem({ item, onMove }: ListItemProps) {
-  const canMovePrev = item.status !== TodoStatus.TODO;
-  const canMoveNext = item.status !== TodoStatus.DONE;
+interface ExtendedListItemProps extends ListItemProps {
+  canMove: (status: TodoStatus, direction: Direction) => boolean;
+}
+
+export function ListItem({ item, onMove, canMove }: ExtendedListItemProps) {
+  const canMovePrev = canMove(item.status, Direction.PREV);
+  const canMoveNext = canMove(item.status, Direction.NEXT);
 
   const handleMovePrev = () => {
     onMove(item.id, Direction.PREV);

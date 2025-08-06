@@ -20,3 +20,6 @@ export interface Column {
   title: string;
   items: Item[];
 }
+
+export type ItemsByStatus = Record<TodoStatus, Item[]>;
+export type TransitionMap = Record<TodoStatus, Record<Direction, TodoStatus>>;
