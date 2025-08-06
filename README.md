@@ -1,100 +1,87 @@
-## Video Intro
-https://www.loom.com/share/3df7fcb5424644638b00724cb178e2ff
+# Configuration-Driven Todo List ([every-io engineering challenge](https://github.com/every-io/engineer-interview))
 
-* [Getting Started with the Every.io engineering challenge.](#getting-started-with-the-everyio-engineering-challenge)
-  * [The biggest factor will be your code:](#the-biggest-factor-will-be-your-code)
-  * [Requirements](#requirements)
-  * [Quick Start](#quick-start)
-* [Original CRA README below](#original-cra-readme-below)
-  * [Getting Started with Create React App](#getting-started-with-create-react-app)
-  * [Available Scripts](#available-scripts)
-    * [`yarn start`](#yarn-start)
-    * [`yarn test`](#yarn-test)
-    * [`yarn build`](#yarn-build)
-    * [`yarn eject`](#yarn-eject)
-  * [Learn More](#learn-more)
+A flexible, scalable todo list application built with React + TypeScript using configuration-driven architecture patterns.
+
+## Demo
+
+https://github.com/user-attachments/assets/06c19a1f-e186-4f6f-929f-bbb03b437cad
 
 
-# Getting Started with the Every.io engineering challenge.
-Thanks for taking the time to complete the Every.io code challenge. Don't worry, it's not too hard, and please do not spend more than an hour or two. We know you have lots of these to do, and it can be very time consuming. If you feel like adding fancy animations, or getting all hip and fresh with the design, go ahead, but it won't earn you any extra points.
-## The biggest factor will be your code:
-1. How readable, is your code.
-2. How did you organize your components.
-3. Are there any bugs.
+## Features
 
-## Requirements
+- **Configuration-Driven Workflow**: Easy to add/modify states and transitions through configuration
+- **Reusable UI Components**: Button (with size/color variants) and Card components
+- **Type-Safe State Management**: Full TypeScript support with proper typing
+- **Clean Architecture**: Separation of concerns with custom hooks and declarative configuration
 
-[See the prototype for an example.](https://www.figma.com/proto/kd49ArXbBt0vi1kBSLkmC1/Code-Challenge?node-id=1%3A2&scaling=min-zoom&page-id=0%3A1)
+## Current Workflow
 
-You will be creating a basic todo list, with the following functionality.
-1. The list has 3 states. Each represented by a column. Similar to Trello.
-   1. `Todo`
-   2. `In Progress`
-   3. `Done`
-2. Each list item has a right and left arrow button.
-   1. The right arrow moves the list item from:
-      1. `Todo` to `In Progress`
-      2. `In Progress` to `Done`
-   2. The Left arrow moves the list item from
-      1. `Done` to `In Progress`
-      2. `In Progress` to `Todo`
-3. If the list in the in the `Todo` column, the left button should be disabled
-4. If the list is in the `Done` column, the right button should be disabled.
-5. There should be form with a text input below the buttons. When the user submits the form, the text from the text input should be added to a new todo item in the `Todo` column.
+**To Do → In Progress → Done**
 
-## Quick Start
-1. npm install
-2. npm run start
-3. open your browser to http://localhost:3000
-4. Delete the `h2` from the component in `src/ChallengeComponent.tsx`
-5. Add your code to that component.
+Items can move forward (Next) or backward (Previous) through the workflow with automatic button state management.
 
+## Architecture
 
------------------------
-# Original CRA README below
-## Getting Started with Create React App
+### Key Components
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+- `ToDoList/` - Main todo list implementation
+  - `workflowConfig.ts` - Declarative workflow configuration
+  - `useToDoList.tsx` - Generic state management hook
+  - `types.ts` - TypeScript definitions
+- `ui/` - Reusable UI components
+  - `Button.tsx` - Configurable button with variants
+  - `Card.tsx` - Container component with hover effects
 
-## Available Scripts
+### Adding New States
 
-In the project directory, you can run:
+Simply update the configuration:
 
-### `yarn start`
+```typescript
+// 1. Add to enum
+export enum TodoStatus {
+  TODO = 'todo',
+  IN_PROGRESS = 'in-progress',
+  REVIEW = 'review',        // New state
+  DONE = 'done'
+}
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+// 2. Update workflow config
+export const defaultWorkflowConfig = {
+  statuses: [
+    { id: TodoStatus.REVIEW, title: 'Review', order: 2 },
+    // ... other statuses
+  ],
+  transitions: [
+    { from: TodoStatus.IN_PROGRESS, to: TodoStatus.REVIEW, direction: Direction.NEXT },
+    { from: TodoStatus.REVIEW, to: TodoStatus.DONE, direction: Direction.NEXT },
+    // ... other transitions
+  ],
+};
+```
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+The UI automatically renders the new workflow with proper state management.
 
-### `yarn test`
+## Development
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Scripts
 
-### `yarn build`
+```bash
+npm start          # Development server
+npm run build      # Production build=
+npm run lint       # Check code quality
+npm run lint:fix   # Fix linting issues
+npm run format     # Format code with Prettier
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Code Quality
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- **ESLint**: Configured with minimal rules for React + TypeScript
+- **Prettier**: Consistent code formatting
+- **TypeScript**: Full type safety with strict configuration
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Tech Stack
 
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+- React 17 + TypeScript
+- Custom hooks for state management
+- Configuration-driven architecture
+- ESLint + Prettier for code quality
