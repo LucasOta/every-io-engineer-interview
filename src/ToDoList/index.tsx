@@ -1,5 +1,5 @@
 import React from 'react';
-import { Column } from './types';
+import { Column, TodoStatus, Direction } from './types';
 import { ListColumn } from './ListColumn';
 import { AddItemForm } from './AddItemForm';
 import { useToDoList } from './useToDoList';
@@ -8,29 +8,29 @@ export function ToDoList() {
   const { getItemsByStatus, addTodo, moveItem } = useToDoList();
 
   const toDoColumn: Column = {
-    status: 'todo',
+    status: TodoStatus.TODO,
     title: 'Todo',
-    items: getItemsByStatus('todo')
+    items: getItemsByStatus(TodoStatus.TODO)
   };
 
   const inProgressColumn: Column = {
-    status: 'in-progress',
+    status: TodoStatus.IN_PROGRESS,
     title: 'In Progress',
-    items: getItemsByStatus('in-progress')
+    items: getItemsByStatus(TodoStatus.IN_PROGRESS)
   };
 
   const doneColumn: Column = {
-    status: 'done',
+    status: TodoStatus.DONE,
     title: 'Done',
-    items: getItemsByStatus('done')
+    items: getItemsByStatus(TodoStatus.DONE)
   };
 
   const handleMoveLeft = (itemId: string) => {
-    moveItem(itemId, 'left');
+    moveItem(itemId, Direction.LEFT);
   };
 
   const handleMoveRight = (itemId: string) => {
-    moveItem(itemId, 'right');
+    moveItem(itemId, Direction.RIGHT);
   };
 
   const handleAddTodo = (text: string) => {
