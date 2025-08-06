@@ -8,6 +8,21 @@ const initialItems: Item[] = [
   { id: '4', text: 'Deploy application', status: TodoStatus.DONE },
 ];
 
+const statusTransitions = {
+  [TodoStatus.TODO]: {
+    [Direction.RIGHT]: TodoStatus.IN_PROGRESS,
+    [Direction.LEFT]: TodoStatus.TODO, // No change
+  },
+  [TodoStatus.IN_PROGRESS]: {
+    [Direction.RIGHT]: TodoStatus.DONE,
+    [Direction.LEFT]: TodoStatus.TODO,
+  },
+  [TodoStatus.DONE]: {
+    [Direction.RIGHT]: TodoStatus.DONE, // No change
+    [Direction.LEFT]: TodoStatus.IN_PROGRESS,
+  },
+};
+
 export function useToDoList() {
   const [items, setItems] = useState<Item[]>(initialItems);
 
@@ -27,7 +42,15 @@ export function useToDoList() {
   };
 
   const moveItem = (itemId: string, direction: Direction) => {
-    console.log('Move item:', itemId, direction);
+    setItems(prevItems => 
+      prevItems.map(item => {
+        if (item.id === itemId) {
+          const newStatus = statusTransitions[item.status][direction];
+          return { ...item, status: newStatus };
+        }
+        return item;
+      })
+    );
   };
 
   return {
