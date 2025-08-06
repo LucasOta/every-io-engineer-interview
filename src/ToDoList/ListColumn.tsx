@@ -1,6 +1,6 @@
-import React from 'react';
 import { Column } from './types';
 import { ListItem } from './ListItem';
+import { Card } from '../ui';
 
 interface ListColumnProps {
   column: Column;
@@ -10,12 +10,9 @@ interface ListColumnProps {
 
 export function ListColumn({ column, onMoveLeft, onMoveRight }: ListColumnProps) {
   return (
-    <div style={{
+    <Card style={{
       flex: 1,
       backgroundColor: '#f8f9fa',
-      border: '1px solid #dee2e6',
-      borderRadius: '8px',
-      padding: '16px',
       margin: '0 8px',
       minHeight: '400px'
     }}>
@@ -40,6 +37,6 @@ export function ListColumn({ column, onMoveLeft, onMoveRight }: ListColumnProps)
           />
         ))}
       </div>
-    </div>
+    </Card>
   );
 }
