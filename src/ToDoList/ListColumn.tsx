@@ -17,9 +17,7 @@ export function ListColumn({ title, items, onMove, canMove }: ListColumnProps) {
     }}>
       <h3 style={{
         textAlign: 'center',
-        marginBottom: '16px',
-        color: '#495057',
-        textTransform: 'capitalize'
+        marginBottom: '16px'
       }}>
         {title}
       </h3>

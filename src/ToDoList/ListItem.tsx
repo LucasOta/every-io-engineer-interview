@@ -3,14 +3,11 @@ import { Button, Card } from '../ui';
 
 interface ListItemProps {
   item: Item;
+  canMove: (status: TodoStatus, direction: Direction) => boolean;
   onMove: (itemId: string, direction: Direction) => void;
 }
 
-interface ExtendedListItemProps extends ListItemProps {
-  canMove: (status: TodoStatus, direction: Direction) => boolean;
-}
-
-export function ListItem({ item, onMove, canMove }: ExtendedListItemProps) {
+export function ListItem({ item, onMove, canMove }: ListItemProps) {
   const canMovePrev = canMove(item.status, Direction.PREV);
   const canMoveNext = canMove(item.status, Direction.NEXT);
 
