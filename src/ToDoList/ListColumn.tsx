@@ -1,15 +1,14 @@
-import { Column, TodoStatus } from './types';
+import { Item, Direction } from './types';
 import { ListItem } from './ListItem';
 import { Card } from '../ui';
-import { STATUS_CODES } from 'http';
 
 interface ListColumnProps {
-  column: Column;
-  onMoveLeft: (itemId: string) => void;
-  onMoveRight: (itemId: string) => void;
+  title: string;
+  items: Item[];
+  onMove: (itemId: string, direction: Direction) => void;
 }
 
-export function ListColumn({ column, onMoveLeft, onMoveRight }: ListColumnProps) {
+export function ListColumn({ title, items, onMove }: ListColumnProps) {
   return (
     <Card style={{
       flex: 1,
@@ -21,18 +20,15 @@ export function ListColumn({ column, onMoveLeft, onMoveRight }: ListColumnProps)
         color: '#495057',
         textTransform: 'capitalize'
       }}>
-        {column.title}
+        {title}
       </h3>
       
       <div>
-        {column.items.map(item => (
+        {items.map(item => (
           <ListItem
             key={item.id}
             item={item}
-            onMoveLeft={() => onMoveLeft(item.id)}
-            onMoveRight={() => onMoveRight(item.id)}
-            canMoveLeft={column.status !== TodoStatus.TODO}
-            canMoveRight={column.status !== TodoStatus.DONE}
+            onMove={onMove}
           />
         ))}
       </div>

@@ -5,8 +5,8 @@ export enum TodoStatus {
 }
 
 export enum Direction {
-  LEFT = 'left',
-  RIGHT = 'right'
+  PREV = 'prev',
+  NEXT = 'next'
 }
 
 export interface Item {

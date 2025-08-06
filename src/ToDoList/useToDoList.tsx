@@ -1,34 +1,38 @@
 import { useState } from 'react';
 import { Item, TodoStatus, Direction } from './types';
 
-const initialItems: Item[] = [
-  { id: '1', text: 'Learn React', status: TodoStatus.TODO },
-  { id: '2', text: 'Build todo app', status: TodoStatus.TODO },
-  { id: '3', text: 'Write tests', status: TodoStatus.IN_PROGRESS },
-  { id: '4', text: 'Deploy application', status: TodoStatus.DONE },
-];
+type ItemsByStatus = Record<TodoStatus, Item[]>;
+
+const initialItemsByStatus: ItemsByStatus = {
+  [TodoStatus.TODO]: [
+    { id: '1', text: 'Learn React', status: TodoStatus.TODO },
+    { id: '2', text: 'Build todo app', status: TodoStatus.TODO },
+  ],
+  [TodoStatus.IN_PROGRESS]: [
+    { id: '3', text: 'Write tests', status: TodoStatus.IN_PROGRESS },
+  ],
+  [TodoStatus.DONE]: [
+    { id: '4', text: 'Deploy application', status: TodoStatus.DONE },
+  ],
+};
 
 const statusTransitions = {
   [TodoStatus.TODO]: {
-    [Direction.RIGHT]: TodoStatus.IN_PROGRESS,
-    [Direction.LEFT]: TodoStatus.TODO, // No change
+    [Direction.NEXT]: TodoStatus.IN_PROGRESS,
+    [Direction.PREV]: TodoStatus.TODO, // No change
   },
   [TodoStatus.IN_PROGRESS]: {
-    [Direction.RIGHT]: TodoStatus.DONE,
-    [Direction.LEFT]: TodoStatus.TODO,
+    [Direction.NEXT]: TodoStatus.DONE,
+    [Direction.PREV]: TodoStatus.TODO,
   },
   [TodoStatus.DONE]: {
-    [Direction.RIGHT]: TodoStatus.DONE, // No change
-    [Direction.LEFT]: TodoStatus.IN_PROGRESS,
+    [Direction.NEXT]: TodoStatus.DONE, // No change
+    [Direction.PREV]: TodoStatus.IN_PROGRESS,
   },
 };
 
 export function useToDoList() {
-  const [items, setItems] = useState<Item[]>(initialItems);
-
-  const getItemsByStatus = (status: TodoStatus): Item[] => {
-    return items.filter(item => item.status === status);
-  };
+  const [itemsByStatus, setItemsByStatus] = useState<ItemsByStatus>(initialItemsByStatus);
 
   const addTodo = (text: string) => {
     if (text.trim()) {
@@ -37,25 +41,40 @@ export function useToDoList() {
         text: text.trim(),
         status: TodoStatus.TODO
       };
-      setItems(prevItems => [...prevItems, newItem]);
+      setItemsByStatus(prev => ({
+        ...prev,
+        [TodoStatus.TODO]: [...prev[TodoStatus.TODO], newItem]
+      }));
     }
   };
 
   const moveItem = (itemId: string, direction: Direction) => {
-    setItems(prevItems => 
-      prevItems.map(item => {
-        if (item.id === itemId) {
-          const newStatus = statusTransitions[item.status][direction];
-          return { ...item, status: newStatus };
-        }
-        return item;
-      })
-    );
+    setItemsByStatus(prev => {
+      const currentItem = Object.values(prev)
+        .flat()
+        .find(item => item.id === itemId);
+      
+      if (!currentItem) return prev;
+      
+      const currentStatus = currentItem.status;
+      const newStatus = statusTransitions[currentStatus][direction];
+      
+      if (currentStatus === newStatus) return prev;
+      
+      const updatedItem = { ...currentItem, status: newStatus };
+      
+      return {
+        ...prev,
+        [currentStatus]: prev[currentStatus].filter(item => item.id !== itemId),
+        [newStatus]: [...prev[newStatus], updatedItem]
+      };
+    });
   };
 
   return {
-    items,
-    getItemsByStatus,
+    todoItems: itemsByStatus[TodoStatus.TODO],
+    inProgressItems: itemsByStatus[TodoStatus.IN_PROGRESS],
+    doneItems: itemsByStatus[TodoStatus.DONE],
     addTodo,
     moveItem,
   };
