@@ -1,6 +1,7 @@
-import { Column } from './types';
+import { Column, TodoStatus } from './types';
 import { ListItem } from './ListItem';
 import { Card } from '../ui';
+import { STATUS_CODES } from 'http';
 
 interface ListColumnProps {
   column: Column;
@@ -12,8 +13,6 @@ export function ListColumn({ column, onMoveLeft, onMoveRight }: ListColumnProps)
   return (
     <Card style={{
       flex: 1,
-      backgroundColor: '#f8f9fa',
-      margin: '0 8px',
       minHeight: '400px'
     }}>
       <h3 style={{
@@ -32,8 +31,8 @@ export function ListColumn({ column, onMoveLeft, onMoveRight }: ListColumnProps)
             item={item}
             onMoveLeft={() => onMoveLeft(item.id)}
             onMoveRight={() => onMoveRight(item.id)}
-            canMoveLeft={column.status !== 'todo'}
-            canMoveRight={column.status !== 'done'}
+            canMoveLeft={column.status !== TodoStatus.TODO}
+            canMoveRight={column.status !== TodoStatus.DONE}
           />
         ))}
       </div>
